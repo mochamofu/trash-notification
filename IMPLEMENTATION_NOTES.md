@@ -94,6 +94,7 @@ iOSの通知は`UNUserNotificationCenter`を使う。
 - 下部バナー広告
 - ゴミ出し完了後広告
 - 広告解除の買い切り購入
+- クリック可能なプロトタイプで画面遷移を検証
 
 後回し:
 
@@ -103,6 +104,21 @@ iOSの通知は`UNUserNotificationCenter`を使う。
 - ウィジェット
 - Apple Watch対応
 - 広告ABテスト
+
+## Interactive Prototype Behavior
+
+`gomi-stamp-interactive.html`では、実アプリ実装前の画面遷移を確認する。
+
+シミュレーション済み:
+
+- 今日画面のゴミ出し完了チェック
+- 完了画面への遷移
+- 完了後広告の表示
+- 360円広告解除の疑似購入
+- 広告解除後の広告非表示
+- 今日/予定/設定タブの切り替え
+
+実装時はこの状態管理をSwiftUIの`Observable`なストアへ置き換え、広告解除はStoreKit 2の購入状態に接続する。
 
 ## GitHub Repository Name
 
