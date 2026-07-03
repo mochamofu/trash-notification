@@ -23,6 +23,8 @@
       --teal-soft: #def4f2;
       --purple: #7657a8;
       --purple-soft: #eee8fb;
+      --ad: #30343b;
+      --ad-soft: #f0f2f5;
       --dark: #111419;
       --shadow: 0 22px 60px rgba(22, 28, 36, .18);
       font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
@@ -41,7 +43,7 @@
     }
 
     .page {
-      max-width: 1440px;
+      max-width: 2100px;
       margin: 0 auto;
       padding: 40px 28px 56px;
     }
@@ -86,7 +88,7 @@
 
     .storyboard {
       display: grid;
-      grid-template-columns: repeat(5, minmax(240px, 1fr));
+      grid-template-columns: repeat(7, minmax(240px, 1fr));
       gap: 22px;
       align-items: start;
       overflow-x: auto;
@@ -492,6 +494,128 @@
       font-weight: 900;
     }
 
+    .ad-banner {
+      border: 1px dashed #bfc5cf;
+      background: var(--ad-soft);
+      border-radius: 8px;
+      min-height: 46px;
+      padding: 7px 10px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      margin-top: auto;
+      color: var(--ad);
+    }
+
+    .ad-banner strong {
+      font-size: 11px;
+      line-height: 1.25;
+    }
+
+    .ad-banner span {
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .remove-ads {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 6px 8px;
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .done-hero {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      gap: 8px;
+      min-height: 166px;
+      border-radius: 8px;
+      background: var(--green-soft);
+      color: var(--green);
+      border: 1px solid #bddfcf;
+      margin-bottom: 10px;
+      padding: 16px;
+    }
+
+    .done-hero .big-check {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: var(--green);
+      color: #fff;
+      font-size: 32px;
+      font-weight: 900;
+    }
+
+    .done-hero h2 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    .done-hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .ad-modal-screen {
+      background: rgba(17,20,25,.64);
+      display: grid;
+      align-items: end;
+      padding: 38px 14px 14px;
+    }
+
+    .ad-modal {
+      background: #fff;
+      border-radius: 18px 18px 8px 8px;
+      border: 1px solid var(--line);
+      padding: 12px;
+      box-shadow: 0 -18px 40px rgba(17,20,25,.22);
+    }
+
+    .ad-preview {
+      min-height: 186px;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(35,127,88,.12), rgba(52,111,189,.16)),
+        #f6f8fb;
+      border: 1px dashed #bfc5cf;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .ad-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .tiny-note {
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.4;
+      margin: 8px 0 0;
+      text-align: center;
+    }
+
     .notification {
       background: rgba(255,255,255,.82);
       border: 1px solid rgba(255,255,255,.55);
@@ -595,6 +719,7 @@
         <span>ローカル通知</span>
         <span>ドラッグ設定</span>
         <span>週次・隔週・第n曜日</span>
+        <span>広告解除 360円</span>
       </div>
     </section>
 
@@ -731,6 +856,10 @@
                   <span class="check"></span>
                 </div>
               </div>
+              <div class="ad-banner">
+                <div><strong>広告スペース</strong><br><span>起動直後は表示せず、通常画面の下部に固定</span></div>
+                <button class="remove-ads">広告を外す</button>
+              </div>
               <div class="bottom-tabs">
                 <div class="tab active">今日</div>
                 <div class="tab">予定</div>
@@ -742,7 +871,66 @@
       </article>
 
       <article class="shot">
-        <p class="shot-title">5. 前日夜・当日朝の通知</p>
+        <p class="shot-title">5. ゴミ出し完了後にだけ広告</p>
+        <div class="phone">
+          <div class="screen">
+            <div class="island"></div>
+            <div class="app">
+              <div class="topbar">
+                <div class="brand"><span class="mark">S</span>完了</div>
+                <div class="icon-btn">×</div>
+              </div>
+              <div class="done-hero">
+                <div class="big-check">✓</div>
+                <h2>可燃ごみ、出した</h2>
+                <p>今日の確認が終わったので、次の予定へ戻ります。</p>
+              </div>
+              <div class="cards">
+                <div class="next-card">
+                  <span class="dot" style="background: var(--purple)"></span>
+                  <div><h3>次は明日: 古紙</h3><p>今夜 22:00 に通知</p></div>
+                  <span class="check"></span>
+                </div>
+              </div>
+              <div class="ad-banner">
+                <div><strong>広告スペース</strong><br><span>確認後など、作業完了タイミングで表示</span></div>
+                <button class="remove-ads">360円</button>
+              </div>
+              <button class="secondary">ホームへ戻る</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="shot">
+        <p class="shot-title">6. 広告解除の買い切り</p>
+        <div class="phone">
+          <div class="screen">
+            <div class="island"></div>
+            <div class="app">
+              <div class="topbar">
+                <div class="brand"><span class="mark">S</span>広告解除</div>
+                <div class="icon-btn">×</div>
+              </div>
+              <div class="hero-card">
+                <h2>広告なしで使う</h2>
+                <p>下部広告と完了後広告を外します。通知、予定、設定の機能はそのまま使えます。</p>
+                <button class="primary">360円で広告を外す</button>
+                <button class="secondary">あとで</button>
+              </div>
+              <div class="setup-list">
+                <div class="setup-row"><span>下部バナー広告</span><span class="badge b-green">非表示</span></div>
+                <div class="setup-row"><span>確認後広告</span><span class="badge b-green">非表示</span></div>
+                <div class="setup-row"><span>起動時広告</span><span class="badge b-amber">出さない</span></div>
+              </div>
+              <p class="tiny-note">一度購入すると、この端末のアプリ内で広告なし状態を復元できます。</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="shot">
+        <p class="shot-title">7. 前日夜・当日朝の通知</p>
         <div class="phone">
           <div class="screen lock">
             <div class="island"></div>
