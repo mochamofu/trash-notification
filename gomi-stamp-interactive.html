@@ -176,6 +176,21 @@
       margin-bottom: 12px;
     }
 
+    .quick-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .quick-row .small-copy {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 750;
+    }
+
     .date {
       color: #cbd2dc;
       font-size: 12px;
@@ -394,6 +409,94 @@
       color: var(--amber);
     }
 
+    .stamp-tray {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin-bottom: 10px;
+    }
+
+    .stamp-option {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      min-height: 46px;
+      display: grid;
+      place-items: center;
+      padding: 6px 4px;
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1.15;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .stamp-option.active {
+      outline: 3px solid rgba(35,127,88,.24);
+      border-color: var(--green);
+    }
+
+    .stamp-burnable { background: var(--green-soft); color: var(--green); border-color: #b8dfca; }
+    .stamp-plastic { background: var(--blue-soft); color: var(--blue); border-color: #bfd1f1; }
+    .stamp-paper { background: var(--purple-soft); color: var(--purple); border-color: #d4c6f0; }
+    .stamp-nonburn { background: var(--amber-soft); color: var(--amber); border-color: #f2d49d; }
+
+    .section-label {
+      margin: 10px 0 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .week-editor {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .day-button {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      min-height: 128px;
+      padding: 6px 3px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .day-button strong {
+      font-size: 11px;
+    }
+
+    .mini-stamp {
+      width: 100%;
+      border-radius: 7px;
+      padding: 5px 2px;
+      min-height: 30px;
+      display: grid;
+      place-items: center;
+      font-size: 9px;
+      line-height: 1.1;
+      font-weight: 900;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+    }
+
+    .mini-empty {
+      border: 1px dashed #c7ccd3;
+      color: #a3a9b0;
+      background: #fafafa;
+      writing-mode: horizontal-tb;
+    }
+
+    .setup-actions {
+      display: grid;
+      gap: 8px;
+      margin-top: auto;
+    }
+
     .overlay {
       position: absolute;
       inset: 0;
@@ -503,28 +606,30 @@
             <button class="icon-btn" id="settingsButton" type="button" aria-label="設定">⚙</button>
           </div>
 
-          <section class="view active" id="todayView">
+          <section class="view active" id="setupView">
+            <div class="panel">
+              <h2>まずは曜日を作る</h2>
+              <p>自治体のゴミ表を見ながら、スタンプを曜日に置いていきます。あとから予定タブで何度でも直せます。</p>
+              <button class="primary" id="startSetupButton" type="button">週間サイクルを作る</button>
+              <button class="secondary" id="skipSetupButton" type="button">サンプルで始める</button>
+            </div>
+            <div class="cards" style="margin-top: 12px;">
+              <div class="setting-row"><span>可燃ごみ</span><span class="badge">月・金</span></div>
+              <div class="setting-row"><span>プラスチック</span><span class="badge" style="background: var(--blue-soft); color: var(--blue);">火</span></div>
+              <div class="setting-row"><span>古紙</span><span class="badge" style="background: var(--purple-soft); color: var(--purple);">土</span></div>
+            </div>
+          </section>
+
+          <section class="view" id="todayView">
             <div class="today-card">
               <div class="date">7月3日 金曜日</div>
               <h2 id="todayHeadline">今日は可燃ごみの日</h2>
             </div>
-            <div class="cards">
-              <div class="item">
-                <span class="dot"></span>
-                <div><h3>可燃ごみ</h3><p id="burnableStatus">当日 7:00 通知済み</p></div>
-                <button class="check-btn" id="doneButton" type="button" aria-label="可燃ごみを出した">✓</button>
-              </div>
-              <div class="item">
-                <span class="dot" style="background: var(--purple)"></span>
-                <div><h3>明日: 古紙</h3><p>今夜 22:00 に通知</p></div>
-                <button class="check-btn" type="button" aria-label="未完了"></button>
-              </div>
-              <div class="item">
-                <span class="dot" style="background: var(--blue)"></span>
-                <div><h3>火曜: プラ</h3><p>毎週火曜日</p></div>
-                <button class="check-btn" type="button" aria-label="未完了"></button>
-              </div>
+            <div class="quick-row">
+              <span class="small-copy">曜日ごとの回収予定</span>
+              <button class="pill-btn" id="todayScheduleButton" type="button">週間サイクル</button>
             </div>
+            <div class="cards" id="todayList"></div>
             <div class="ad-banner ad-unit">
               <div><strong>広告スペース</strong><span>通常画面の下部に固定</span></div>
               <button class="pill-btn removeAdsButton" type="button">広告を外す</button>
@@ -553,13 +658,18 @@
 
           <section class="view" id="scheduleView">
             <div class="panel">
-              <h2>今週の予定</h2>
-              <p>通知は前日22:00と当日7:00。広告は予定確認の邪魔にならない位置だけに表示します。</p>
-            </div>
-            <div class="cards" style="margin-top: 12px;">
-              <div class="setting-row"><span>月・金</span><span class="badge">可燃ごみ</span></div>
-              <div class="setting-row"><span>火</span><span class="badge" style="background: var(--blue-soft); color: var(--blue);">プラ</span></div>
-              <div class="setting-row"><span>土</span><span class="badge" style="background: var(--purple-soft); color: var(--purple);">古紙</span></div>
+              <h2>週間サイクル</h2>
+              <p>ゴミ種別を選んで曜日を押すと、その曜日のスタンプが切り替わります。</p>
+              <p class="section-label">ゴミ種別</p>
+              <div class="stamp-tray" id="stampTray">
+                <button class="stamp-option stamp-burnable active" data-waste="burnable" type="button">可燃</button>
+                <button class="stamp-option stamp-plastic" data-waste="plastic" type="button">プラ</button>
+                <button class="stamp-option stamp-paper" data-waste="paper" type="button">古紙</button>
+                <button class="stamp-option stamp-nonburn" data-waste="nonburn" type="button">不燃</button>
+              </div>
+              <p class="section-label">曜日を押して配置</p>
+              <div class="week-editor" id="weekEditor"></div>
+              <button class="primary" id="saveScheduleButton" type="button">保存して今日へ反映</button>
             </div>
             <div class="ad-banner ad-unit">
               <div><strong>広告スペース</strong><span>予定画面の下部に固定</span></div>
@@ -570,14 +680,13 @@
           <section class="view" id="settingsView">
             <div class="panel">
               <h2>広告なしで使う</h2>
-              <p>下部バナー広告と完了後広告を外します。起動時広告は無料版でも出しません。</p>
+              <p>下部バナー広告と完了後広告を外します。通知、予定、設定はそのまま使えます。</p>
               <button class="primary" id="purchaseButton" type="button">360円で広告を外す</button>
               <button class="secondary" id="restoreButton" type="button">購入を復元</button>
             </div>
             <div class="cards" style="margin-top: 12px;">
               <div class="setting-row"><span>下部バナー広告</span><span class="badge ad-state">表示</span></div>
               <div class="setting-row"><span>確認後広告</span><span class="badge ad-state">表示</span></div>
-              <div class="setting-row"><span>起動時広告</span><span class="badge warn">出さない</span></div>
             </div>
           </section>
 
@@ -608,11 +717,11 @@
 
     <section class="notes">
       <h1>ゴミスタンプ<br>シミュレーター</h1>
-      <p>クリックで画面遷移を試せるプロトタイプです。広告は起動時には出さず、ゴミ出し確認後などの作業完了タイミングにだけ出る設計にしています。</p>
+      <p>クリックで初期設定、曜日ごとのゴミ配置、ゴミ出し確認、広告解除まで試せるプロトタイプです。</p>
       <div class="hint-list">
-        <div class="hint"><strong>1.</strong> 今日画面のチェックボタンを押すと、ゴミ出し完了画面へ移動します。</div>
-        <div class="hint"><strong>2.</strong> 無料版では完了後に広告シートが出ます。</div>
-        <div class="hint"><strong>3.</strong> 「360円で広告を外す」を押すと広告なし状態になります。</div>
+        <div class="hint"><strong>1.</strong> 初回画面の「週間サイクルを作る」から、ゴミ種別を選んで曜日を押せます。</div>
+        <div class="hint"><strong>2.</strong> 保存すると今日画面に反映され、チェックでゴミ出し完了にできます。</div>
+        <div class="hint"><strong>3.</strong> 無料版では完了後に広告シートが出て、360円で広告なし状態になります。</div>
       </div>
     </section>
   </main>
@@ -620,11 +729,23 @@
   <script>
     const state = {
       adFree: localStorage.getItem("gomiStampAdFree") === "true",
-      current: "today",
-      trashDone: false
+      setupComplete: localStorage.getItem("gomiStampSetupComplete") === "true",
+      current: "setup",
+      trashDone: false,
+      selectedWaste: "burnable",
+      schedule: JSON.parse(localStorage.getItem("gomiStampSchedule") || "null") || {
+        mon: ["burnable"],
+        tue: ["plastic"],
+        wed: [],
+        thu: [],
+        fri: ["burnable"],
+        sat: ["paper"],
+        sun: []
+      }
     };
 
     const views = {
+      setup: document.getElementById("setupView"),
       today: document.getElementById("todayView"),
       done: document.getElementById("doneView"),
       schedule: document.getElementById("scheduleView"),
@@ -632,15 +753,46 @@
     };
 
     const titles = {
+      setup: "初期設定",
       today: "今日",
       done: "完了",
       schedule: "予定",
       settings: "広告解除"
     };
 
+    const wasteMeta = {
+      burnable: { label: "可燃ごみ", short: "可燃", color: "var(--green)", className: "stamp-burnable" },
+      plastic: { label: "プラスチック", short: "プラ", color: "var(--blue)", className: "stamp-plastic" },
+      paper: { label: "古紙", short: "古紙", color: "var(--purple)", className: "stamp-paper" },
+      nonburn: { label: "不燃ごみ", short: "不燃", color: "var(--amber)", className: "stamp-nonburn" }
+    };
+
+    const dayMeta = [
+      ["mon", "月"],
+      ["tue", "火"],
+      ["wed", "水"],
+      ["thu", "木"],
+      ["fri", "金"],
+      ["sat", "土"],
+      ["sun", "日"]
+    ];
+
     const screenTitle = document.getElementById("screenTitle");
     const toast = document.getElementById("toast");
     const overlay = document.getElementById("adOverlay");
+
+    function saveSchedule() {
+      localStorage.setItem("gomiStampSchedule", JSON.stringify(state.schedule));
+    }
+
+    function completeSetup() {
+      state.setupComplete = true;
+      localStorage.setItem("gomiStampSetupComplete", "true");
+      saveSchedule();
+      renderScheduleEditor();
+      renderToday();
+      setView("today");
+    }
 
     function showToast(message) {
       toast.textContent = message;
@@ -658,6 +810,89 @@
         tab.classList.toggle("active", tab.dataset.tab === name || (name === "done" && tab.dataset.tab === "today"));
       });
       screenTitle.textContent = titles[name];
+    }
+
+    function renderScheduleEditor() {
+      const weekEditor = document.getElementById("weekEditor");
+      weekEditor.innerHTML = "";
+      dayMeta.forEach(([dayKey, label]) => {
+        const button = document.createElement("button");
+        button.className = "day-button";
+        button.type = "button";
+        button.dataset.day = dayKey;
+        const wasteList = state.schedule[dayKey] || [];
+        const stamps = wasteList.length
+          ? wasteList.map((waste) => `<span class="mini-stamp ${wasteMeta[waste].className}">${wasteMeta[waste].short}</span>`).join("")
+          : `<span class="mini-stamp mini-empty">+</span>`;
+        button.innerHTML = `<strong>${label}</strong>${stamps}`;
+        button.addEventListener("click", () => toggleWasteForDay(dayKey));
+        weekEditor.appendChild(button);
+      });
+
+      document.querySelectorAll(".stamp-option").forEach((button) => {
+        button.classList.toggle("active", button.dataset.waste === state.selectedWaste);
+      });
+    }
+
+    function toggleWasteForDay(dayKey) {
+      const current = state.schedule[dayKey] || [];
+      if (current.includes(state.selectedWaste)) {
+        state.schedule[dayKey] = current.filter((waste) => waste !== state.selectedWaste);
+      } else {
+        state.schedule[dayKey] = [...current, state.selectedWaste];
+      }
+      renderScheduleEditor();
+    }
+
+    function renderToday() {
+      const todayKey = "fri";
+      const tomorrowKey = "sat";
+      const todayWastes = state.schedule[todayKey] || [];
+      const tomorrowWastes = state.schedule[tomorrowKey] || [];
+      const todayList = document.getElementById("todayList");
+      todayList.innerHTML = "";
+
+      document.getElementById("todayHeadline").textContent = todayWastes.length
+        ? `今日は${todayWastes.map((waste) => wasteMeta[waste].short).join("・")}の日`
+        : "今日はゴミ出しなし";
+
+      todayWastes.forEach((waste) => {
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <span class="dot" style="background: ${wasteMeta[waste].color}"></span>
+          <div><h3>${wasteMeta[waste].label}</h3><p id="${waste}Status">当日 7:00 通知済み</p></div>
+          <button class="check-btn doneWasteButton" type="button" aria-label="${wasteMeta[waste].label}を出した">✓</button>
+        `;
+        item.querySelector(".doneWasteButton").addEventListener("click", () => completeTrash(waste));
+        todayList.appendChild(item);
+      });
+
+      if (!todayWastes.length) {
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `<span class="dot" style="background: #a3a9b0"></span><div><h3>予定なし</h3><p>曜日設定は予定タブで変更できます</p></div><button class="check-btn" type="button"></button>`;
+        todayList.appendChild(item);
+      }
+
+      if (tomorrowWastes.length) {
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <span class="dot" style="background: ${wasteMeta[tomorrowWastes[0]].color}"></span>
+          <div><h3>明日: ${tomorrowWastes.map((waste) => wasteMeta[waste].short).join("・")}</h3><p>今夜 22:00 に通知</p></div>
+          <button class="check-btn" type="button" aria-label="未完了"></button>
+        `;
+        todayList.appendChild(item);
+      }
+    }
+
+    function completeTrash(waste) {
+      state.trashDone = true;
+      document.getElementById("todayHeadline").textContent = "今日は完了";
+      setView("done");
+      document.querySelector("#doneView h2").textContent = `${wasteMeta[waste].label}、出した`;
+      window.setTimeout(showPostActionAd, 600);
     }
 
     function updateAds() {
@@ -689,16 +924,21 @@
       showToast("広告なし状態になりました");
     }
 
-    document.getElementById("doneButton").addEventListener("click", () => {
-      state.trashDone = true;
-      document.getElementById("burnableStatus").textContent = "出した";
-      document.getElementById("todayHeadline").textContent = "今日は完了";
-      setView("done");
-      window.setTimeout(showPostActionAd, 600);
+    document.getElementById("startSetupButton").addEventListener("click", () => {
+      renderScheduleEditor();
+      setView("schedule");
     });
-
+    document.getElementById("skipSetupButton").addEventListener("click", completeSetup);
+    document.getElementById("saveScheduleButton").addEventListener("click", () => {
+      completeSetup();
+      showToast("週間サイクルを保存しました");
+    });
     document.getElementById("backHomeButton").addEventListener("click", () => setView("today"));
     document.getElementById("settingsButton").addEventListener("click", () => setView("settings"));
+    document.getElementById("todayScheduleButton").addEventListener("click", () => {
+      renderScheduleEditor();
+      setView("schedule");
+    });
     document.getElementById("closeAdButton").addEventListener("click", () => overlay.classList.remove("active"));
     document.getElementById("purchaseButton").addEventListener("click", purchaseAdRemoval);
     document.getElementById("restoreButton").addEventListener("click", () => {
@@ -714,10 +954,29 @@
     });
 
     document.querySelectorAll(".tab").forEach((button) => {
-      button.addEventListener("click", () => setView(button.dataset.tab));
+      button.addEventListener("click", () => {
+        if (!state.setupComplete && button.dataset.tab !== "settings") {
+          renderScheduleEditor();
+          setView("schedule");
+          return;
+        }
+        if (button.dataset.tab === "schedule") renderScheduleEditor();
+        if (button.dataset.tab === "today") renderToday();
+        setView(button.dataset.tab);
+      });
     });
 
+    document.querySelectorAll(".stamp-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.selectedWaste = button.dataset.waste;
+        renderScheduleEditor();
+      });
+    });
+
+    renderScheduleEditor();
+    renderToday();
     updateAds();
+    setView(state.setupComplete ? "today" : "setup");
   </script>
 </body>
 </html>
