@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ゴミスタンプ Prototype</title>
+  <style>
+    :root {
+      --ink: #202124;
+      --muted: #646a73;
+      --line: #d9dee6;
+      --paper: #f7f4ed;
+      --surface: #ffffff;
+      --green: #237f58;
+      --green-soft: #e3f3ea;
+      --blue: #346fbd;
+      --blue-soft: #e6eefb;
+      --amber: #a56713;
+      --amber-soft: #fff1d8;
+      --pink: #b44a65;
+      --pink-soft: #fae6ec;
+      --teal: #087c82;
+      --teal-soft: #def4f2;
+      --purple: #7657a8;
+      --purple-soft: #eee8fb;
+      --dark: #111419;
+      --shadow: 0 22px 60px rgba(22, 28, 36, .18);
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(32,33,36,.04) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(32,33,36,.04) 1px, transparent 1px),
+        var(--paper);
+      background-size: 32px 32px;
+    }
+
+    .page {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 40px 28px 56px;
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(280px, 420px) 1fr;
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 42px;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .intro p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .legend span {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.72);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .storyboard {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(240px, 1fr));
+      gap: 22px;
+      align-items: start;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+
+    .shot {
+      min-width: 248px;
+    }
+
+    .shot-title {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 10px 10px;
+    }
+
+    .phone {
+      width: 248px;
+      height: 520px;
+      padding: 11px;
+      border-radius: 38px;
+      background: #111419;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .screen {
+      height: 100%;
+      overflow: hidden;
+      border-radius: 28px;
+      background: #fbfaf6;
+      position: relative;
+    }
+
+    .island {
+      width: 78px;
+      height: 22px;
+      border-radius: 999px;
+      background: #111419;
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+    }
+
+    .app {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 38px 14px 12px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 28px;
+      margin-bottom: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 17px;
+    }
+
+    .mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--green);
+      color: white;
+      font-size: 15px;
+    }
+
+    .icon-btn {
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .hero-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 8px;
+    }
+
+    .hero-card h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .hero-card p, .small {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .primary {
+      width: 100%;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      background: var(--green);
+      color: white;
+      font-weight: 800;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    .secondary {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .setup-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .setup-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge {
+      min-width: 48px;
+      text-align: center;
+      padding: 5px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .b-green { color: var(--green); background: var(--green-soft); }
+    .b-blue { color: var(--blue); background: var(--blue-soft); }
+    .b-amber { color: var(--amber); background: var(--amber-soft); }
+    .b-pink { color: var(--pink); background: var(--pink-soft); }
+    .b-teal { color: var(--teal); background: var(--teal-soft); }
+    .b-purple { color: var(--purple); background: var(--purple-soft); }
+
+    .section-label {
+      margin: 12px 0 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .stamp-tray {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin-bottom: 8px;
+    }
+
+    .stamp {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      min-height: 42px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 5px;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .stamp.green { background: var(--green-soft); color: var(--green); border-color: #b8dfca; }
+    .stamp.blue { background: var(--blue-soft); color: var(--blue); border-color: #bfd1f1; }
+    .stamp.amber { background: var(--amber-soft); color: var(--amber); border-color: #f2d49d; }
+    .stamp.pink { background: var(--pink-soft); color: var(--pink); border-color: #efbdca; }
+    .stamp.teal { background: var(--teal-soft); color: var(--teal); border-color: #a8dedb; }
+    .stamp.purple { background: var(--purple-soft); color: var(--purple); border-color: #d4c6f0; }
+
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      flex: 1;
+    }
+
+    .day {
+      min-width: 0;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 6px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .day strong {
+      font-size: 10px;
+      text-align: center;
+    }
+
+    .day .mini {
+      border-radius: 7px;
+      min-height: 28px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 3px;
+      font-size: 8px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .empty {
+      border: 1px dashed #c7ccd3;
+      color: #a3a9b0;
+      background: #fafafa;
+    }
+
+    .drag-hint {
+      position: absolute;
+      right: 20px;
+      top: 154px;
+      width: 94px;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(17,20,25,.88);
+      color: white;
+      font-size: 10px;
+      line-height: 1.35;
+      transform: rotate(-4deg);
+    }
+
+    .sheet {
+      margin-top: auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px 18px 8px 8px;
+      padding: 12px;
+      box-shadow: 0 -8px 30px rgba(17,20,25,.08);
+    }
+
+    .grabber {
+      width: 36px;
+      height: 4px;
+      margin: 0 auto 10px;
+      border-radius: 999px;
+      background: #d7dbe2;
+    }
+
+    .sheet h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: #eef1f4;
+      padding: 3px;
+      border-radius: 9px;
+      gap: 3px;
+      margin-bottom: 10px;
+    }
+
+    .segmented span {
+      text-align: center;
+      padding: 7px 4px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .segmented .active {
+      color: var(--ink);
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(17,20,25,.08);
+    }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 0;
+      border-top: 1px solid #eef0f3;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .switch {
+      width: 42px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--green);
+      padding: 3px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .switch::after {
+      content: "";
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .today-card {
+      background: var(--dark);
+      color: #fff;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .today-card .date {
+      color: #cbd2dc;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .today-card h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+      line-height: 1.2;
+    }
+
+    .cards {
+      display: grid;
+      gap: 8px;
+    }
+
+    .next-card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 11px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .next-card h3 {
+      margin: 0 0 3px;
+      font-size: 13px;
+    }
+
+    .next-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .check {
+      width: 26px;
+      height: 26px;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .notification {
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: 17px;
+      padding: 11px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 34px rgba(17,20,25,.16);
+      margin-top: 10px;
+    }
+
+    .notification-head {
+      display: flex;
+      justify-content: space-between;
+      color: #717781;
+      font-size: 10px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .notification h3 {
+      margin: 0 0 4px;
+      font-size: 13px;
+    }
+
+    .notification p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.35;
+      color: #3c4046;
+    }
+
+    .lock {
+      background:
+        linear-gradient(160deg, rgba(35,127,88,.92), rgba(8,124,130,.82)),
+        #1d4c43;
+      color: white;
+    }
+
+    .lock .app {
+      padding-top: 44px;
+    }
+
+    .time {
+      text-align: center;
+      font-size: 52px;
+      font-weight: 200;
+      letter-spacing: 0;
+      margin-top: 4px;
+    }
+
+    .lock-date {
+      text-align: center;
+      font-size: 13px;
+      margin-bottom: 76px;
+      color: rgba(255,255,255,.8);
+    }
+
+    .bottom-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid #eceff3;
+    }
+
+    .tab {
+      text-align: center;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 6px 2px;
+      border-radius: 8px;
+    }
+
+    .tab.active {
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    @media (max-width: 900px) {
+      .intro {
+        grid-template-columns: 1fr;
+      }
+
+      .legend {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="intro">
+      <div>
+        <h1>ゴミスタンプ</h1>
+        <p>地域ごとのゴミ出し周期を、スタンプを置く感覚で作る生活リマインダー。前日夜と当日朝に、端末内のローカル通知で知らせます。</p>
+      </div>
+      <div class="legend" aria-label="feature highlights">
+        <span>API費用なし</span>
+        <span>ローカル通知</span>
+        <span>ドラッグ設定</span>
+        <span>週次・隔週・第n曜日</span>
+      </div>
+    </section>
+
+    <section class="storyboard" aria-label="prototype storyboard">
+      <article class="shot">
+        <p class="shot-title">1. 初回セットアップ</p>
+        <div class="phone">
+          <div class="screen">
+            <div class="island"></div>
+            <div class="app">
+              <div class="topbar">
+                <div class="brand"><span class="mark">S</span>ゴミスタンプ</div>
+                <div class="icon-btn">?</div>
+              </div>
+              <div class="hero-card">
+                <h2>あなたの町のゴミの日を作ろう</h2>
+                <p>自治体の表を見ながら、よく使うゴミ種別を曜日へ置くだけ。あとから何度でも直せます。</p>
+                <button class="primary">週間サイクルを作る</button>
+                <button class="secondary">テンプレートから始める</button>
+              </div>
+              <div class="setup-list">
+                <div class="setup-row"><span>可燃ごみ</span><span class="badge b-green">毎週</span></div>
+                <div class="setup-row"><span>プラスチック</span><span class="badge b-blue">毎週</span></div>
+                <div class="setup-row"><span>びん・缶・ペット</span><span class="badge b-teal">隔週</span></div>
+                <div class="setup-row"><span>不燃ごみ</span><span class="badge b-amber">第2</span></div>
+              </div>
+              <div class="bottom-tabs">
+                <div class="tab active">今日</div>
+                <div class="tab">予定</div>
+                <div class="tab">設定</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="shot">
+        <p class="shot-title">2. スタンプで週間サイクル作成</p>
+        <div class="phone">
+          <div class="screen">
+            <div class="island"></div>
+            <div class="app">
+              <div class="topbar">
+                <div class="brand"><span class="mark">S</span>週間設定</div>
+                <div class="icon-btn">✓</div>
+              </div>
+              <p class="section-label">ゴミ種別</p>
+              <div class="stamp-tray">
+                <div class="stamp green">可燃</div>
+                <div class="stamp blue">プラ</div>
+                <div class="stamp teal">びん<br>缶</div>
+                <div class="stamp pink">ペット</div>
+                <div class="stamp amber">不燃</div>
+                <div class="stamp purple">古紙</div>
+                <div class="stamp amber">段ボール</div>
+                <div class="stamp teal">資源</div>
+              </div>
+              <p class="section-label">曜日へドラッグ</p>
+              <div class="week-grid">
+                <div class="day"><strong>月</strong><div class="mini green">可燃</div></div>
+                <div class="day"><strong>火</strong><div class="mini blue">プラ</div></div>
+                <div class="day"><strong>水</strong><div class="mini empty">+</div></div>
+                <div class="day"><strong>木</strong><div class="mini teal">びん<br>缶</div></div>
+                <div class="day"><strong>金</strong><div class="mini green">可燃</div></div>
+                <div class="day"><strong>土</strong><div class="mini purple">古紙</div></div>
+                <div class="day"><strong>日</strong><div class="mini empty">休</div></div>
+              </div>
+              <div class="drag-hint">プラを火曜へ置くと、毎週火曜として登録</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="shot">
+        <p class="shot-title">3. 周期と通知時刻を編集</p>
+        <div class="phone">
+          <div class="screen">
+            <div class="island"></div>
+            <div class="app">
+              <div class="topbar">
+                <div class="brand"><span class="mark">S</span>プラの日</div>
+                <div class="icon-btn">×</div>
+              </div>
+              <div class="today-card">
+                <div class="date">火曜日に設定中</div>
+                <h2>プラスチックごみ</h2>
+              </div>
+              <div class="sheet">
+                <div class="grabber"></div>
+                <h3>回収周期</h3>
+                <div class="segmented">
+                  <span class="active">毎週</span>
+                  <span>隔週</span>
+                  <span>第n</span>
+                </div>
+                <div class="form-row"><span>前日夜に通知</span><strong>22:00</strong></div>
+                <div class="form-row"><span>当日朝に通知</span><strong>7:00</strong></div>
+                <div class="form-row"><span>祝日は手動で調整</span><span class="switch"></span></div>
+                <button class="primary">保存して通知を予約</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="shot">
+        <p class="shot-title">4. 今日・明日のゴミを確認</p>
+        <div class="phone">
+          <div class="screen">
+            <div class="island"></div>
+            <div class="app">
+              <div class="topbar">
+                <div class="brand"><span class="mark">S</span>今日</div>
+                <div class="icon-btn">⚙</div>
+              </div>
+              <div class="today-card">
+                <div class="date">7月3日 金曜日</div>
+                <h2>今日は可燃ごみの日</h2>
+              </div>
+              <div class="cards">
+                <div class="next-card">
+                  <span class="dot"></span>
+                  <div><h3>可燃ごみ</h3><p>当日 7:00 通知済み</p></div>
+                  <span class="check">✓</span>
+                </div>
+                <div class="next-card">
+                  <span class="dot" style="background: var(--purple)"></span>
+                  <div><h3>明日: 古紙</h3><p>今夜 22:00 に通知</p></div>
+                  <span class="check"></span>
+                </div>
+                <div class="next-card">
+                  <span class="dot" style="background: var(--blue)"></span>
+                  <div><h3>火曜: プラ</h3><p>毎週火曜日</p></div>
+                  <span class="check"></span>
+                </div>
+              </div>
+              <div class="bottom-tabs">
+                <div class="tab active">今日</div>
+                <div class="tab">予定</div>
+                <div class="tab">設定</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="shot">
+        <p class="shot-title">5. 前日夜・当日朝の通知</p>
+        <div class="phone">
+          <div class="screen lock">
+            <div class="island"></div>
+            <div class="app">
+              <div class="time">22:00</div>
+              <div class="lock-date">7月3日 金曜日</div>
+              <div class="notification">
+                <div class="notification-head"><span>ゴミスタンプ</span><span>今</span></div>
+                <h3>明日は古紙の日です</h3>
+                <p>新聞・雑誌・段ボールをまとめておくと、朝が楽です。</p>
+              </div>
+              <div class="notification">
+                <div class="notification-head"><span>ゴミスタンプ</span><span>7:00</span></div>
+                <h3>今日は可燃ごみの日です</h3>
+                <p>出発前に玄関の袋を確認しましょう。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
