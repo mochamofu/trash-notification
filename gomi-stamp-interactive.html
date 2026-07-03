@@ -218,6 +218,11 @@
       margin-bottom: 12px;
     }
 
+    .today-card.is-complete {
+      background: var(--green-soft);
+      border-color: color-mix(in srgb, var(--green) 42%, var(--line));
+    }
+
     .quick-row {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -249,6 +254,11 @@
       letter-spacing: 0;
     }
 
+    .today-card h2 span {
+      display: inline-block;
+      margin-top: 2px;
+    }
+
     .cards {
       display: grid;
       gap: 9px;
@@ -263,6 +273,30 @@
       grid-template-columns: auto 1fr auto;
       gap: 11px;
       align-items: center;
+      width: 100%;
+      color: var(--ink);
+      font: inherit;
+      text-align: left;
+      transition: opacity .18s ease, transform .18s ease, background .18s ease;
+    }
+
+    button.item {
+      cursor: pointer;
+    }
+
+    button.item:active {
+      transform: scale(.985);
+    }
+
+    .item.completed {
+      opacity: .56;
+      background: var(--surface-soft);
+    }
+
+    .item.completed h3 {
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      text-decoration-color: color-mix(in srgb, var(--ink) 46%, transparent);
     }
 
     .dot {
@@ -292,7 +326,12 @@
       color: var(--green);
       font-size: 20px;
       font-weight: 900;
-      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .check-btn.inert {
+      opacity: .28;
     }
 
     .primary,
@@ -647,7 +686,7 @@
           <div class="topbar">
             <div class="brand"><span class="mark">S</span><span id="screenTitle">今日</span></div>
             <div class="top-actions">
-              <button class="icon-btn" id="themeButton" type="button" aria-label="表示モード">夜</button>
+              <button class="icon-btn" id="themeButton" type="button" aria-label="表示モード">🌙</button>
               <button class="icon-btn" id="settingsButton" type="button" aria-label="設定">⚙</button>
             </div>
           </div>
@@ -779,6 +818,8 @@
       setupComplete: localStorage.getItem("gomiStampSetupComplete") === "true",
       current: "setup",
       trashDone: false,
+      completedToday: [],
+      postActionAdShown: false,
       selectedWaste: "burnable",
       schedule: JSON.parse(localStorage.getItem("gomiStampSchedule") || "null") || {
         mon: ["burnable"],
@@ -831,7 +872,7 @@
 
     function applyTheme() {
       document.documentElement.dataset.theme = state.theme;
-      themeButton.textContent = state.theme === "dark" ? "昼" : "夜";
+      themeButton.textContent = state.theme === "dark" ? "☀️" : "🌙";
       themeButton.setAttribute("aria-label", state.theme === "dark" ? "ライトモードに切り替え" : "ダークモードに切り替え");
     }
 
@@ -841,6 +882,8 @@
 
     function completeSetup() {
       state.setupComplete = true;
+      state.completedToday = [];
+      state.postActionAdShown = false;
       localStorage.setItem("gomiStampSetupComplete", "true");
       saveSchedule();
       renderScheduleEditor();
@@ -904,28 +947,41 @@
       const todayWastes = state.schedule[todayKey] || [];
       const tomorrowWastes = state.schedule[tomorrowKey] || [];
       const todayList = document.getElementById("todayList");
+      const todayHeadline = document.getElementById("todayHeadline");
+      const todayCard = document.querySelector(".today-card");
+      const completedSet = new Set(state.completedToday);
+      const activeWastes = todayWastes.filter((waste) => !completedSet.has(waste));
+      const completedWastes = todayWastes.filter((waste) => completedSet.has(waste));
+      const allDone = todayWastes.length > 0 && completedWastes.length === todayWastes.length;
       todayList.innerHTML = "";
 
-      document.getElementById("todayHeadline").textContent = todayWastes.length
-        ? `今日は${todayWastes.map((waste) => wasteMeta[waste].short).join("・")}の日`
-        : "今日はゴミ出しなし";
+      todayCard.classList.toggle("is-complete", allDone);
+      todayHeadline.innerHTML = todayWastes.length
+        ? allDone
+          ? `今日のゴミ出しは<br><span>終わり</span>`
+          : `今日は<br><span>${todayWastes.map((waste) => wasteMeta[waste].short).join("・")}の日</span>`
+        : `今日は<br><span>ゴミ出しなし</span>`;
 
-      todayWastes.forEach((waste) => {
-        const item = document.createElement("div");
-        item.className = "item";
+      [...activeWastes, ...completedWastes].forEach((waste) => {
+        const isCompleted = completedSet.has(waste);
+        const item = document.createElement("button");
+        item.className = `item${isCompleted ? " completed" : ""}`;
+        item.type = "button";
+        item.setAttribute("aria-pressed", String(isCompleted));
+        item.setAttribute("aria-label", `${wasteMeta[waste].label}を${isCompleted ? "未完了に戻す" : "出したことにする"}`);
         item.innerHTML = `
           <span class="dot" style="background: ${wasteMeta[waste].color}"></span>
-          <div><h3>${wasteMeta[waste].label}</h3><p id="${waste}Status">当日 7:00 通知済み</p></div>
-          <button class="check-btn doneWasteButton" type="button" aria-label="${wasteMeta[waste].label}を出した">✓</button>
+          <div><h3>${wasteMeta[waste].label}</h3><p id="${waste}Status">${isCompleted ? "出しました" : "当日 7:00 通知済み"}</p></div>
+          <span class="check-btn" aria-hidden="true">${isCompleted ? "✓" : ""}</span>
         `;
-        item.querySelector(".doneWasteButton").addEventListener("click", () => completeTrash(waste));
+        item.addEventListener("click", () => toggleTrashDone(waste));
         todayList.appendChild(item);
       });
 
       if (!todayWastes.length) {
         const item = document.createElement("div");
         item.className = "item";
-        item.innerHTML = `<span class="dot" style="background: #a3a9b0"></span><div><h3>予定なし</h3><p>曜日設定は予定タブで変更できます</p></div><button class="check-btn" type="button"></button>`;
+        item.innerHTML = `<span class="dot" style="background: #a3a9b0"></span><div><h3>予定なし</h3><p>曜日設定は予定タブで変更できます</p></div><span class="check-btn inert" aria-hidden="true"></span>`;
         todayList.appendChild(item);
       }
 
@@ -935,18 +991,34 @@
         item.innerHTML = `
           <span class="dot" style="background: ${wasteMeta[tomorrowWastes[0]].color}"></span>
           <div><h3>明日: ${tomorrowWastes.map((waste) => wasteMeta[waste].short).join("・")}</h3><p>今夜 22:00 に通知</p></div>
-          <button class="check-btn" type="button" aria-label="未完了"></button>
+          <span class="check-btn inert" aria-hidden="true"></span>
         `;
         todayList.appendChild(item);
       }
     }
 
-    function completeTrash(waste) {
-      state.trashDone = true;
-      document.getElementById("todayHeadline").textContent = "今日は完了";
-      setView("done");
-      document.querySelector("#doneView h2").textContent = `${wasteMeta[waste].label}、出した`;
-      window.setTimeout(showPostActionAd, 600);
+    function toggleTrashDone(waste) {
+      const isCompleted = state.completedToday.includes(waste);
+      state.completedToday = isCompleted
+        ? state.completedToday.filter((item) => item !== waste)
+        : [...state.completedToday, waste];
+      state.trashDone = state.completedToday.length > 0;
+      renderToday();
+
+      const todayWastes = state.schedule.fri || [];
+      const allDone = todayWastes.length > 0 && todayWastes.every((item) => state.completedToday.includes(item));
+      if (allDone) {
+        if (state.adFree) {
+          showToast("今日のゴミ出しは終わりました");
+        } else if (!state.postActionAdShown) {
+          state.postActionAdShown = true;
+          toast.classList.remove("show");
+          window.setTimeout(showPostActionAd, 600);
+        }
+      } else {
+        state.postActionAdShown = false;
+        showToast(isCompleted ? "未完了に戻しました" : `${wasteMeta[waste].label}を出しました`);
+      }
     }
 
     function updateAds() {
@@ -984,6 +1056,8 @@
     });
     document.getElementById("skipSetupButton").addEventListener("click", completeSetup);
     document.getElementById("saveScheduleButton").addEventListener("click", () => {
+      state.completedToday = [];
+      state.postActionAdShown = false;
       completeSetup();
       showToast("週間サイクルを保存しました");
     });
