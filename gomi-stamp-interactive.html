@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ゴミスタンプ Interactive Prototype</title>
+  <style>
+    :root {
+      --ink: #202124;
+      --muted: #666d78;
+      --line: #d9dee6;
+      --paper: #f7f4ed;
+      --green: #237f58;
+      --green-soft: #e3f3ea;
+      --blue: #346fbd;
+      --blue-soft: #e6eefb;
+      --amber: #a56713;
+      --amber-soft: #fff1d8;
+      --purple: #7657a8;
+      --purple-soft: #eee8fb;
+      --dark: #111419;
+      --danger: #b44a65;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(32,33,36,.045) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(32,33,36,.045) 1px, transparent 1px),
+        var(--paper);
+      background-size: 32px 32px;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+    }
+
+    .stage {
+      display: grid;
+      grid-template-columns: 330px minmax(260px, 360px);
+      gap: 34px;
+      align-items: center;
+      max-width: 780px;
+      width: 100%;
+    }
+
+    .notes h1 {
+      margin: 0 0 10px;
+      font-size: 40px;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .notes p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+      margin: 0 0 18px;
+    }
+
+    .hint-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .hint {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.78);
+      border-radius: 8px;
+      padding: 11px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .hint strong {
+      color: var(--ink);
+    }
+
+    .phone {
+      width: 320px;
+      height: 668px;
+      border-radius: 44px;
+      background: #111419;
+      padding: 12px;
+      box-shadow: 0 26px 70px rgba(17,20,25,.24);
+    }
+
+    .screen {
+      height: 100%;
+      border-radius: 32px;
+      overflow: hidden;
+      background: #fbfaf6;
+      position: relative;
+    }
+
+    .island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 92px;
+      height: 26px;
+      border-radius: 999px;
+      background: #111419;
+      z-index: 5;
+    }
+
+    .app {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 46px 16px 12px;
+      position: relative;
+    }
+
+    .topbar {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 850;
+    }
+
+    .mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      background: var(--green);
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .view {
+      display: none;
+      min-height: 0;
+      flex: 1;
+      flex-direction: column;
+    }
+
+    .view.active {
+      display: flex;
+    }
+
+    .today-card {
+      background: var(--dark);
+      color: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .date {
+      color: #cbd2dc;
+      font-size: 12px;
+      font-weight: 750;
+      margin-bottom: 8px;
+    }
+
+    .today-card h2,
+    .done-card h2,
+    .panel h2 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.22;
+      letter-spacing: 0;
+    }
+
+    .cards {
+      display: grid;
+      gap: 9px;
+    }
+
+    .item {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 11px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .item h3 {
+      margin: 0 0 4px;
+      font-size: 14px;
+    }
+
+    .item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .check-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--green);
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .primary,
+    .secondary {
+      width: 100%;
+      border-radius: 8px;
+      padding: 13px 14px;
+      font-size: 15px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .primary {
+      border: 0;
+      background: var(--green);
+      color: #fff;
+    }
+
+    .secondary {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .ad-banner {
+      border: 1px dashed #bfc5cf;
+      background: #f0f2f5;
+      border-radius: 8px;
+      padding: 8px 10px;
+      min-height: 52px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      margin-top: auto;
+      color: #30343b;
+    }
+
+    .ad-banner strong {
+      font-size: 12px;
+    }
+
+    .ad-banner span {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 2px;
+      line-height: 1.25;
+    }
+
+    .pill-btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 7px 9px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      border-top: 1px solid #eceff3;
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+
+    .tab {
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      padding: 8px 4px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .done-card {
+      min-height: 210px;
+      border-radius: 8px;
+      border: 1px solid #bddfcf;
+      background: var(--green-soft);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      gap: 8px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+
+    .big-check {
+      width: 68px;
+      height: 68px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      background: var(--green);
+      color: #fff;
+      font-size: 38px;
+      font-weight: 900;
+      margin: 0 auto;
+    }
+
+    .done-card p,
+    .panel p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 6px 8px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .badge.warn {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: end;
+      padding: 12px;
+      background: rgba(17,20,25,.62);
+      z-index: 10;
+    }
+
+    .overlay.active {
+      display: flex;
+    }
+
+    .sheet {
+      width: 100%;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px 20px 12px 12px;
+      padding: 12px;
+      box-shadow: 0 -18px 42px rgba(17,20,25,.22);
+    }
+
+    .grabber {
+      width: 38px;
+      height: 4px;
+      border-radius: 999px;
+      background: #d7dbe2;
+      margin: 0 auto 12px;
+    }
+
+    .fake-ad {
+      min-height: 190px;
+      border: 1px dashed #bfc5cf;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(35,127,88,.12), rgba(52,111,189,.16)),
+        #f6f8fb;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      padding: 16px;
+      margin-bottom: 10px;
+    }
+
+    .ad-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .toast {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 78px;
+      transform: translateY(16px);
+      opacity: 0;
+      background: rgba(17,20,25,.92);
+      color: #fff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 15;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 760px) {
+      body {
+        align-items: start;
+        padding: 18px;
+      }
+
+      .stage {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+
+      .notes {
+        max-width: 320px;
+      }
+
+      .notes h1 {
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <section class="phone" aria-label="iPhone prototype">
+      <div class="screen">
+        <div class="island"></div>
+        <div class="app">
+          <div class="topbar">
+            <div class="brand"><span class="mark">S</span><span id="screenTitle">今日</span></div>
+            <button class="icon-btn" id="settingsButton" type="button" aria-label="設定">⚙</button>
+          </div>
+
+          <section class="view active" id="todayView">
+            <div class="today-card">
+              <div class="date">7月3日 金曜日</div>
+              <h2 id="todayHeadline">今日は可燃ごみの日</h2>
+            </div>
+            <div class="cards">
+              <div class="item">
+                <span class="dot"></span>
+                <div><h3>可燃ごみ</h3><p id="burnableStatus">当日 7:00 通知済み</p></div>
+                <button class="check-btn" id="doneButton" type="button" aria-label="可燃ごみを出した">✓</button>
+              </div>
+              <div class="item">
+                <span class="dot" style="background: var(--purple)"></span>
+                <div><h3>明日: 古紙</h3><p>今夜 22:00 に通知</p></div>
+                <button class="check-btn" type="button" aria-label="未完了"></button>
+              </div>
+              <div class="item">
+                <span class="dot" style="background: var(--blue)"></span>
+                <div><h3>火曜: プラ</h3><p>毎週火曜日</p></div>
+                <button class="check-btn" type="button" aria-label="未完了"></button>
+              </div>
+            </div>
+            <div class="ad-banner ad-unit">
+              <div><strong>広告スペース</strong><span>通常画面の下部に固定</span></div>
+              <button class="pill-btn removeAdsButton" type="button">広告を外す</button>
+            </div>
+          </section>
+
+          <section class="view" id="doneView">
+            <div class="done-card">
+              <div>
+                <div class="big-check">✓</div>
+                <h2>可燃ごみ、出した</h2>
+              </div>
+              <p>今日の確認が終わりました。次は明日の古紙です。</p>
+            </div>
+            <div class="item">
+              <span class="dot" style="background: var(--purple)"></span>
+              <div><h3>次は明日: 古紙</h3><p>今夜 22:00 に通知</p></div>
+              <button class="check-btn" type="button" aria-label="未完了"></button>
+            </div>
+            <div class="ad-banner ad-unit">
+              <div><strong>広告スペース</strong><span>確認後など、作業完了タイミングで表示</span></div>
+              <button class="pill-btn removeAdsButton" type="button">360円</button>
+            </div>
+            <button class="secondary" id="backHomeButton" type="button">ホームへ戻る</button>
+          </section>
+
+          <section class="view" id="scheduleView">
+            <div class="panel">
+              <h2>今週の予定</h2>
+              <p>通知は前日22:00と当日7:00。広告は予定確認の邪魔にならない位置だけに表示します。</p>
+            </div>
+            <div class="cards" style="margin-top: 12px;">
+              <div class="setting-row"><span>月・金</span><span class="badge">可燃ごみ</span></div>
+              <div class="setting-row"><span>火</span><span class="badge" style="background: var(--blue-soft); color: var(--blue);">プラ</span></div>
+              <div class="setting-row"><span>土</span><span class="badge" style="background: var(--purple-soft); color: var(--purple);">古紙</span></div>
+            </div>
+            <div class="ad-banner ad-unit">
+              <div><strong>広告スペース</strong><span>予定画面の下部に固定</span></div>
+              <button class="pill-btn removeAdsButton" type="button">広告を外す</button>
+            </div>
+          </section>
+
+          <section class="view" id="settingsView">
+            <div class="panel">
+              <h2>広告なしで使う</h2>
+              <p>下部バナー広告と完了後広告を外します。起動時広告は無料版でも出しません。</p>
+              <button class="primary" id="purchaseButton" type="button">360円で広告を外す</button>
+              <button class="secondary" id="restoreButton" type="button">購入を復元</button>
+            </div>
+            <div class="cards" style="margin-top: 12px;">
+              <div class="setting-row"><span>下部バナー広告</span><span class="badge ad-state">表示</span></div>
+              <div class="setting-row"><span>確認後広告</span><span class="badge ad-state">表示</span></div>
+              <div class="setting-row"><span>起動時広告</span><span class="badge warn">出さない</span></div>
+            </div>
+          </section>
+
+          <div class="tabs">
+            <button class="tab active" data-tab="today" type="button">今日</button>
+            <button class="tab" data-tab="schedule" type="button">予定</button>
+            <button class="tab" data-tab="settings" type="button">設定</button>
+          </div>
+        </div>
+
+        <div class="overlay" id="adOverlay">
+          <div class="sheet">
+            <div class="grabber"></div>
+            <div class="fake-ad">
+              広告プレビュー<br>
+              ゴミ出し確認が終わった後だけ表示する想定
+            </div>
+            <div class="ad-actions">
+              <button class="secondary" id="closeAdButton" type="button">閉じる</button>
+              <button class="primary removeAdsButton" type="button">360円で外す</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="toast" id="toast" role="status"></div>
+      </div>
+    </section>
+
+    <section class="notes">
+      <h1>ゴミスタンプ<br>シミュレーター</h1>
+      <p>クリックで画面遷移を試せるプロトタイプです。広告は起動時には出さず、ゴミ出し確認後などの作業完了タイミングにだけ出る設計にしています。</p>
+      <div class="hint-list">
+        <div class="hint"><strong>1.</strong> 今日画面のチェックボタンを押すと、ゴミ出し完了画面へ移動します。</div>
+        <div class="hint"><strong>2.</strong> 無料版では完了後に広告シートが出ます。</div>
+        <div class="hint"><strong>3.</strong> 「360円で広告を外す」を押すと広告なし状態になります。</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      adFree: localStorage.getItem("gomiStampAdFree") === "true",
+      current: "today",
+      trashDone: false
+    };
+
+    const views = {
+      today: document.getElementById("todayView"),
+      done: document.getElementById("doneView"),
+      schedule: document.getElementById("scheduleView"),
+      settings: document.getElementById("settingsView")
+    };
+
+    const titles = {
+      today: "今日",
+      done: "完了",
+      schedule: "予定",
+      settings: "広告解除"
+    };
+
+    const screenTitle = document.getElementById("screenTitle");
+    const toast = document.getElementById("toast");
+    const overlay = document.getElementById("adOverlay");
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function setView(name) {
+      state.current = name;
+      Object.entries(views).forEach(([key, view]) => {
+        view.classList.toggle("active", key === name);
+      });
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.classList.toggle("active", tab.dataset.tab === name || (name === "done" && tab.dataset.tab === "today"));
+      });
+      screenTitle.textContent = titles[name];
+    }
+
+    function updateAds() {
+      document.querySelectorAll(".ad-unit").forEach((node) => {
+        node.style.display = state.adFree ? "none" : "grid";
+      });
+      document.querySelectorAll(".ad-state").forEach((node) => {
+        node.textContent = state.adFree ? "非表示" : "表示";
+        node.style.background = state.adFree ? "var(--green-soft)" : "var(--amber-soft)";
+        node.style.color = state.adFree ? "var(--green)" : "var(--amber)";
+      });
+      document.getElementById("purchaseButton").textContent = state.adFree ? "広告解除済み" : "360円で広告を外す";
+      document.getElementById("purchaseButton").disabled = state.adFree;
+    }
+
+    function showPostActionAd() {
+      if (state.adFree) {
+        showToast("広告なし状態です");
+        return;
+      }
+      overlay.classList.add("active");
+    }
+
+    function purchaseAdRemoval() {
+      state.adFree = true;
+      localStorage.setItem("gomiStampAdFree", "true");
+      overlay.classList.remove("active");
+      updateAds();
+      showToast("広告なし状態になりました");
+    }
+
+    document.getElementById("doneButton").addEventListener("click", () => {
+      state.trashDone = true;
+      document.getElementById("burnableStatus").textContent = "出した";
+      document.getElementById("todayHeadline").textContent = "今日は完了";
+      setView("done");
+      window.setTimeout(showPostActionAd, 600);
+    });
+
+    document.getElementById("backHomeButton").addEventListener("click", () => setView("today"));
+    document.getElementById("settingsButton").addEventListener("click", () => setView("settings"));
+    document.getElementById("closeAdButton").addEventListener("click", () => overlay.classList.remove("active"));
+    document.getElementById("purchaseButton").addEventListener("click", purchaseAdRemoval);
+    document.getElementById("restoreButton").addEventListener("click", () => {
+      if (state.adFree) {
+        showToast("購入状態を復元しました");
+      } else {
+        showToast("復元できる購入はありません");
+      }
+    });
+
+    document.querySelectorAll(".removeAdsButton").forEach((button) => {
+      button.addEventListener("click", purchaseAdRemoval);
+    });
+
+    document.querySelectorAll(".tab").forEach((button) => {
+      button.addEventListener("click", () => setView(button.dataset.tab));
+    });
+
+    updateAds();
+  </script>
+</body>
+</html>
