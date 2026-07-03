@@ -8,7 +8,9 @@
 
 - `gomi-stamp-prototype.html`: iPhone画面風のHTMLプロトタイプ
 - `gomi-stamp-storyboard.png`: 主要画面を並べたストーリーボード
-- `gomi-stamp-screen-1.png` - `gomi-stamp-screen-5.png`: 各画面の個別スクリーンショット
+- `gomi-stamp-screen-1.png` - `gomi-stamp-screen-7.png`: 各画面の個別スクリーンショット
+- `gomi-stamp-monetization-storyboard.png`: 広告設計を反映したストーリーボード
+- `gomi-stamp-monetization-screen-1.png` - `gomi-stamp-monetization-screen-7.png`: 広告設計版の個別スクリーンショット
 
 ## Main Flow
 
@@ -17,6 +19,24 @@
 3. 毎週、隔週、第n曜日などの周期を設定
 4. 前日22:00、当日7:00の通知時刻を設定
 5. 今日と明日のゴミ出し予定を確認
+6. ゴミ出し完了後に広告を表示
+7. 360円の買い切りで広告を解除
+
+## Monetization
+
+無料版では、操作を邪魔しにくい位置とタイミングに広告を出す。
+
+- 下部バナー広告
+  - 今日画面、予定画面、設定画面の下部に常時表示
+  - 下タブの上に固定し、主要操作には重ねない
+- 完了後広告
+  - ゴミ出し確認、設定保存など、用事が終わった後に表示
+  - アプリ起動直後や通知タップ直後には出さない
+- 広告解除
+  - 買い切り360円
+  - 下部バナー広告と完了後広告を非表示にする
+
+起動時広告は、急いでゴミ出し確認をしたい体験と相性が悪いため採用しない。
 
 ## Cost Policy
 
@@ -38,3 +58,5 @@ SwiftUIで以下のMVPを実装する想定です。
 - ローカル通知予約
 - 今日、明日の予定表示
 - 通知時刻変更
+- 広告表示制御
+- 広告解除のアプリ内課金
