@@ -7,10 +7,13 @@
 ## Prototype
 
 - `gomi-stamp-prototype.html`: iPhone画面風のHTMLプロトタイプ
+- `gomi-stamp-interactive.html`: クリックで画面遷移を試せるiPhone風シミュレーター
 - `gomi-stamp-storyboard.png`: 主要画面を並べたストーリーボード
 - `gomi-stamp-screen-1.png` - `gomi-stamp-screen-7.png`: 各画面の個別スクリーンショット
 - `gomi-stamp-monetization-storyboard.png`: 広告設計を反映したストーリーボード
 - `gomi-stamp-monetization-screen-1.png` - `gomi-stamp-monetization-screen-7.png`: 広告設計版の個別スクリーンショット
+- `gomi-stamp-interactive-ad.png`: 完了後広告が出る状態の操作確認スクリーンショット
+- `gomi-stamp-interactive-adfree.png`: 広告解除後の操作確認スクリーンショット
 
 ## Main Flow
 
