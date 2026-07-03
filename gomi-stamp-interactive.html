@@ -26,6 +26,8 @@
       --coral-soft: #fde8e4;
       --hero: #eaf6df;
       --hero-border: #cde6c3;
+      --petal: #fff7e9;
+      --petal-border: #ecd9bb;
       --phone: #171b19;
       --shadow: 0 26px 70px rgba(31, 42, 36, .18);
       --button-shadow: 0 8px 18px rgba(47, 125, 88, .22);
@@ -53,6 +55,8 @@
       --coral-soft: #4b2825;
       --hero: #213c2b;
       --hero-border: #346044;
+      --petal: #2a2119;
+      --petal-border: #4a3b2d;
       --phone: #080b09;
       --shadow: 0 26px 70px rgba(0, 0, 0, .42);
       --button-shadow: 0 8px 18px rgba(116, 201, 149, .16);
@@ -65,6 +69,8 @@
       min-height: 100vh;
       color: var(--ink);
       background:
+        radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--petal) 76%, transparent) 0 90px, transparent 91px),
+        radial-gradient(circle at 86% 22%, color-mix(in srgb, var(--green-soft) 68%, transparent) 0 72px, transparent 73px),
         linear-gradient(90deg, color-mix(in srgb, var(--line) 42%, transparent) 1px, transparent 1px),
         linear-gradient(0deg, color-mix(in srgb, var(--line) 42%, transparent) 1px, transparent 1px),
         var(--paper);
@@ -175,9 +181,11 @@
       border-radius: 9px;
       display: grid;
       place-items: center;
-      background: var(--green);
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--green) 86%, white), var(--green));
       color: #fff;
       font-weight: 900;
+      box-shadow: 0 6px 14px color-mix(in srgb, var(--green) 25%, transparent);
     }
 
     .icon-btn {
@@ -210,10 +218,12 @@
     }
 
     .today-card {
-      background: var(--hero);
+      background:
+        radial-gradient(circle at 92% 16%, color-mix(in srgb, var(--petal) 78%, transparent) 0 42px, transparent 43px),
+        var(--hero);
       color: var(--ink);
       border: 1px solid var(--hero-border);
-      border-radius: 18px;
+      border-radius: 22px;
       padding: 17px;
       margin-bottom: 12px;
     }
@@ -267,7 +277,7 @@
     .item {
       border: 1px solid var(--line);
       background: var(--surface);
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 12px;
       display: grid;
       grid-template-columns: auto 1fr auto;
@@ -456,11 +466,31 @@
 
     .panel {
       border: 1px solid var(--line);
-      background: var(--surface);
-      border-radius: 18px;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--petal) 46%, transparent), transparent 135px),
+        var(--surface);
+      border-radius: 22px;
       padding: 16px;
       display: grid;
       gap: 12px;
+    }
+
+    .panel-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .lock-pill {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 6px 8px;
+      font-size: 10px;
+      font-weight: 900;
+      white-space: nowrap;
     }
 
     .setting-row {
@@ -517,6 +547,16 @@
       border-color: var(--green);
     }
 
+    .stamp-option:disabled,
+    .day-button:disabled {
+      cursor: default;
+      opacity: .64;
+    }
+
+    .schedule-locked .stamp-option.active {
+      outline: 0;
+    }
+
     .stamp-burnable { background: var(--green-soft); color: var(--green); border-color: #b8dfca; }
     .stamp-plastic { background: var(--blue-soft); color: var(--blue); border-color: #bfd1f1; }
     .stamp-paper { background: var(--purple-soft); color: var(--purple); border-color: #d4c6f0; }
@@ -538,7 +578,7 @@
     .day-button {
       border: 1px solid var(--line);
       background: var(--surface);
-      border-radius: 14px;
+      border-radius: 16px;
       min-height: 128px;
       padding: 6px 3px;
       display: flex;
@@ -571,6 +611,17 @@
       color: #a3a9b0;
       background: var(--surface-soft);
       writing-mode: horizontal-tb;
+    }
+
+    .schedule-actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .schedule-actions.is-locked {
+      grid-template-columns: 1fr;
     }
 
     .setup-actions {
@@ -637,8 +688,8 @@
       position: absolute;
       left: 18px;
       right: 18px;
-      bottom: 78px;
-      transform: translateY(16px);
+      top: 96px;
+      transform: translateY(-12px);
       opacity: 0;
       background: color-mix(in srgb, var(--phone) 94%, transparent);
       color: #fff;
@@ -686,7 +737,7 @@
           <div class="topbar">
             <div class="brand"><span class="mark">S</span><span id="screenTitle">今日</span></div>
             <div class="top-actions">
-              <button class="icon-btn" id="themeButton" type="button" aria-label="表示モード">🌙</button>
+              <button class="icon-btn" id="themeButton" type="button" aria-label="表示モード">☀️</button>
               <button class="icon-btn" id="settingsButton" type="button" aria-label="設定">⚙</button>
             </div>
           </div>
@@ -742,9 +793,14 @@
           </section>
 
           <section class="view" id="scheduleView">
-            <div class="panel">
-              <h2>週間サイクル</h2>
-              <p>ゴミ種別を選んで曜日を押すと、その曜日のスタンプが切り替わります。</p>
+            <div class="panel" id="schedulePanel">
+              <div class="panel-head">
+                <div>
+                  <h2>週間サイクル</h2>
+                  <p id="scheduleHelp">保存済みのサイクルです。変えたいときだけ変更ボタンを押します。</p>
+                </div>
+                <span class="lock-pill" id="scheduleLockLabel">固定中</span>
+              </div>
               <p class="section-label">ゴミ種別</p>
               <div class="stamp-tray" id="stampTray">
                 <button class="stamp-option stamp-burnable active" data-waste="burnable" type="button">可燃</button>
@@ -754,7 +810,10 @@
               </div>
               <p class="section-label">曜日を押して配置</p>
               <div class="week-editor" id="weekEditor"></div>
-              <button class="primary" id="saveScheduleButton" type="button">保存して今日へ反映</button>
+              <div class="schedule-actions" id="scheduleActions">
+                <button class="primary" id="saveScheduleButton" type="button">保存して固定</button>
+                <button class="secondary" id="editScheduleButton" type="button">変更</button>
+              </div>
             </div>
             <div class="ad-banner ad-unit">
               <div><strong>広告スペース</strong><span>予定画面の下部に固定</span></div>
@@ -820,6 +879,7 @@
       trashDone: false,
       completedToday: [],
       postActionAdShown: false,
+      scheduleEditing: localStorage.getItem("gomiStampSetupComplete") !== "true",
       selectedWaste: "burnable",
       schedule: JSON.parse(localStorage.getItem("gomiStampSchedule") || "null") || {
         mon: ["burnable"],
@@ -872,8 +932,8 @@
 
     function applyTheme() {
       document.documentElement.dataset.theme = state.theme;
-      themeButton.textContent = state.theme === "dark" ? "☀️" : "🌙";
-      themeButton.setAttribute("aria-label", state.theme === "dark" ? "ライトモードに切り替え" : "ダークモードに切り替え");
+      themeButton.textContent = state.theme === "dark" ? "🌙" : "☀️";
+      themeButton.setAttribute("aria-label", state.theme === "dark" ? "現在はダーク表示。ライト表示に切り替え" : "現在はライト表示。ダーク表示に切り替え");
     }
 
     function saveSchedule() {
@@ -882,6 +942,7 @@
 
     function completeSetup() {
       state.setupComplete = true;
+      state.scheduleEditing = false;
       state.completedToday = [];
       state.postActionAdShown = false;
       localStorage.setItem("gomiStampSetupComplete", "true");
@@ -911,11 +972,27 @@
 
     function renderScheduleEditor() {
       const weekEditor = document.getElementById("weekEditor");
+      const schedulePanel = document.getElementById("schedulePanel");
+      const scheduleHelp = document.getElementById("scheduleHelp");
+      const scheduleLockLabel = document.getElementById("scheduleLockLabel");
+      const scheduleActions = document.getElementById("scheduleActions");
+      const saveScheduleButton = document.getElementById("saveScheduleButton");
+      const editScheduleButton = document.getElementById("editScheduleButton");
       weekEditor.innerHTML = "";
+      schedulePanel.classList.toggle("schedule-locked", !state.scheduleEditing);
+      scheduleHelp.textContent = state.scheduleEditing
+        ? "ゴミ種別を選んで曜日を押すと、その曜日のスタンプが切り替わります。保存すると固定されます。"
+        : "保存済みのサイクルです。変えたいときだけ変更ボタンを押します。";
+      scheduleLockLabel.textContent = state.scheduleEditing ? "編集中" : "固定中";
+      scheduleActions.classList.toggle("is-locked", !state.scheduleEditing);
+      saveScheduleButton.style.display = state.scheduleEditing ? "block" : "none";
+      editScheduleButton.style.display = state.scheduleEditing ? "none" : "block";
+
       dayMeta.forEach(([dayKey, label]) => {
         const button = document.createElement("button");
         button.className = "day-button";
         button.type = "button";
+        button.disabled = !state.scheduleEditing;
         button.dataset.day = dayKey;
         const wasteList = state.schedule[dayKey] || [];
         const stamps = wasteList.length
@@ -928,10 +1005,15 @@
 
       document.querySelectorAll(".stamp-option").forEach((button) => {
         button.classList.toggle("active", button.dataset.waste === state.selectedWaste);
+        button.disabled = !state.scheduleEditing;
       });
     }
 
     function toggleWasteForDay(dayKey) {
+      if (!state.scheduleEditing) {
+        showToast("変更ボタンを押すと編集できます");
+        return;
+      }
       const current = state.schedule[dayKey] || [];
       if (current.includes(state.selectedWaste)) {
         state.schedule[dayKey] = current.filter((waste) => waste !== state.selectedWaste);
@@ -1051,6 +1133,7 @@
     }
 
     document.getElementById("startSetupButton").addEventListener("click", () => {
+      state.scheduleEditing = true;
       renderScheduleEditor();
       setView("schedule");
     });
@@ -1059,7 +1142,11 @@
       state.completedToday = [];
       state.postActionAdShown = false;
       completeSetup();
-      showToast("週間サイクルを保存しました");
+      showToast("週間サイクルを固定しました");
+    });
+    document.getElementById("editScheduleButton").addEventListener("click", () => {
+      state.scheduleEditing = true;
+      renderScheduleEditor();
     });
     document.getElementById("backHomeButton").addEventListener("click", () => setView("today"));
     document.getElementById("settingsButton").addEventListener("click", () => setView("settings"));
@@ -1070,6 +1157,7 @@
       showToast(state.theme === "dark" ? "ダークモードにしました" : "ライトモードにしました");
     });
     document.getElementById("todayScheduleButton").addEventListener("click", () => {
+      state.scheduleEditing = false;
       renderScheduleEditor();
       setView("schedule");
     });
@@ -1090,10 +1178,12 @@
     document.querySelectorAll(".tab").forEach((button) => {
       button.addEventListener("click", () => {
         if (!state.setupComplete && button.dataset.tab !== "settings") {
+          state.scheduleEditing = true;
           renderScheduleEditor();
           setView("schedule");
           return;
         }
+        if (button.dataset.tab === "today") state.scheduleEditing = false;
         if (button.dataset.tab === "schedule") renderScheduleEditor();
         if (button.dataset.tab === "today") renderToday();
         setView(button.dataset.tab);
@@ -1102,6 +1192,10 @@
 
     document.querySelectorAll(".stamp-option").forEach((button) => {
       button.addEventListener("click", () => {
+        if (!state.scheduleEditing) {
+          showToast("変更ボタンを押すと編集できます");
+          return;
+        }
         state.selectedWaste = button.dataset.waste;
         renderScheduleEditor();
       });
