@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ゴミスタンプ Interactive Prototype</title>
+  <title>ポイぽん Interactive Prototype</title>
   <style>
     :root {
       --ink: #1f2a24;
@@ -780,7 +780,7 @@
         <div class="island"></div>
         <div class="app">
           <div class="topbar">
-            <div class="brand"><span class="mark">S</span><span id="screenTitle">今日</span></div>
+            <div class="brand"><span class="mark">ぽ</span><span id="screenTitle">ポイぽん</span></div>
             <div class="top-actions">
               <button class="icon-btn" id="themeButton" type="button" aria-label="表示モード">☀️</button>
               <button class="icon-btn" id="settingsButton" type="button" aria-label="設定">⚙</button>
@@ -904,7 +904,7 @@
     </section>
 
     <section class="notes">
-      <h1>ゴミスタンプ<br>シミュレーター</h1>
+      <h1>ポイぽん<br>シミュレーター</h1>
       <p>クリックで初期設定、曜日ごとのゴミ配置、ゴミ出し確認、広告解除まで試せるプロトタイプです。</p>
       <div class="hint-list">
         <div class="hint"><strong>1.</strong> 初回画面の「週間サイクルを作る」から、ゴミ種別を選んで曜日を押せます。</div>
@@ -944,14 +944,6 @@
       settings: document.getElementById("settingsView")
     };
 
-    const titles = {
-      setup: "初期設定",
-      today: "今日",
-      done: "完了",
-      schedule: "予定",
-      settings: "広告解除"
-    };
-
     const wasteMeta = {
       burnable: { label: "可燃ごみ", short: "可燃", color: "var(--green)", className: "stamp-burnable" },
       plastic: { label: "プラスチック", short: "プラ", color: "var(--blue)", className: "stamp-plastic" },
@@ -969,7 +961,6 @@
       ["sun", "日"]
     ];
 
-    const screenTitle = document.getElementById("screenTitle");
     const toast = document.getElementById("toast");
     const overlay = document.getElementById("adOverlay");
     const themeButton = document.getElementById("themeButton");
@@ -1011,7 +1002,6 @@
       document.querySelectorAll(".tab").forEach((tab) => {
         tab.classList.toggle("active", tab.dataset.tab === name || (name === "done" && tab.dataset.tab === "today"));
       });
-      screenTitle.textContent = titles[name];
     }
 
     function renderScheduleEditor() {
